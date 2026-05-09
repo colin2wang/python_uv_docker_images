@@ -1,0 +1,44 @@
+# Docker Image Downloader Configuration
+
+# Proxy settings
+proxy:
+  enabled: true
+  http: "http://localhost:10808"
+  https: "http://localhost:10808"
+
+# Docker Registry configuration
+registry:
+  default: "registry-1.docker.io"
+  auth_url: "https://auth.docker.io/token"
+  service: "registry.docker.io"
+
+# Default image settings
+image:
+  default_repo: "library"
+  default_tag: "latest"
+
+# Output settings
+output:
+  temp_dir: "tmp"  # Temporary directory for image extraction
+  output_dir: "images"   # Output directory for final .tar file (use "." for current directory)
+  temp_dir_prefix: "tmp_"
+  tar_extension: ".tar"
+
+# Architecture selection
+architecture:
+  os: "linux"
+  arch: "amd64"
+
+# SSL verification
+ssl_verify: false
+
+# Request timeout in seconds
+request_timeout: 300
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_dir: "logs"
+  log_file_prefix: "docker_downloader"
+  log_format: "%(asctime)s - [%(levelname)s] - %(name)s - %(filename)s:%(lineno)d - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
