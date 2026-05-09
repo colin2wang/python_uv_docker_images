@@ -10,7 +10,7 @@ import requests
 import urllib3
 
 from logger_config import setup_logger
-from utils import load_config, get_default_docker_config, setup_proxies, parse_image_name
+from utils import load_config, get_default_docker_config, setup_proxies, parse_image_name, print_import_command
 
 urllib3.disable_warnings()
 
@@ -53,11 +53,11 @@ def get_image_input():
 
 # Get image information
 image_string = get_image_input()
-logger.info(f"Processing image: {image_string}")
 
 # Parse image name
 registry, repository, img, tag = parse_image_name(image_string, config)
 repo = repository.split('/')[0] if '/' in repository else repository
+logger.info(f"Processing image: {repository}:{tag}")
 
 # Authenticate with registry
 auth_url = config['registry']['auth_url']
@@ -82,13 +82,22 @@ auth_head = {
 }
 
 # Fetch manifest and select amd64 architecture
+manifest_url = f'https://{registry}/v2/{repository}/manifests/{tag}'
 resp = requests.get(
-    f'https://{registry}/v2/{repository}/manifests/{tag}',
+    manifest_url,
     headers=auth_head,
     verify=ssl_verify,
     proxies=proxies,
     timeout=request_timeout
 )
+
+# Get the digest from response header (this is the image signature)
+image_digest = resp.headers.get('Docker-Content-Digest', '')
+if not image_digest:
+    # Fallback: calculate from content
+    image_digest = 'sha256:' + hashlib.sha256(resp.content).hexdigest()
+
+logger.info(f"Image digest: {image_digest}")
 
 # Handle multi-arch manifest list
 if resp.status_code == 200 and 'manifests' in resp.json():
@@ -103,6 +112,9 @@ if resp.status_code == 200 and 'manifests' in resp.json():
                 proxies=proxies,
                 timeout=request_timeout
             )
+            # Update digest for specific architecture
+            image_digest = resp.headers.get('Docker-Content-Digest', digest)
+            logger.info(f"Architecture-specific digest: {image_digest}")
             break
 
 if resp.status_code != 200:
@@ -111,6 +123,22 @@ if resp.status_code != 200:
     sys.exit(1)
 
 layers = resp.json()['layers']
+
+# Create output directory first
+output_dir = config['output']['output_dir']
+os.makedirs(output_dir, exist_ok=True)
+
+# Generate tar filename with digest for uniqueness
+digest_short = image_digest.replace('sha256:', '')[:12]
+tar_filename = f'{repo.replace("/", "_")}_{img}_{digest_short}{config["output"]["tar_extension"]}'
+docker_tar = os.path.join(output_dir, tar_filename)
+
+# Check if already exists
+if os.path.exists(docker_tar):
+    logger.info(f"Image already exists: {docker_tar}")
+    logger.info(f"Skipping download (digest: {image_digest})")
+    print_import_command(tar_filename, output_dir, image_digest)
+    sys.exit(0)
 
 # Create temp directory
 temp_dir = config['output']['temp_dir']
@@ -187,20 +215,14 @@ with open(os.path.join(imgdir, 'manifest.json'), 'w') as f:
 with open(os.path.join(imgdir, 'repositories'), 'w') as f:
     json.dump({img: {tag: fake_layerid}}, f)
 
-# Write metadata files
-with open(os.path.join(imgdir, 'manifest.json'), 'w') as f:
-    json.dump(content, f)
-
-with open(os.path.join(imgdir, 'repositories'), 'w') as f:
-    json.dump({img: {tag: fake_layerid}}, f)
-
-# Create output directory and generate tar
-output_dir = config['output']['output_dir']
-os.makedirs(output_dir, exist_ok=True)
-
-docker_tar = os.path.join(output_dir, f'{repo.replace("/", "_")}_{img}{config["output"]["tar_extension"]}')
+# Create tar file
+docker_tar = os.path.join(output_dir, tar_filename)
 with tarfile.open(docker_tar, 'w') as tar:
     tar.add(imgdir, arcname=os.path.sep)
 
 shutil.rmtree(imgdir)
 logger.info(f'Export completed: {docker_tar}')
+logger.info(f'Image digest: {image_digest}')
+
+# Print import command
+print_import_command(tar_filename, output_dir, image_digest)
