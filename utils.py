@@ -101,20 +101,34 @@ def format_file_size(size_bytes):
         return f"{size_bytes / (1024 * 1024 * 1024):.2f} GB"
 
 
-def print_import_command(tar_file, output_dir=None, digest=None):
-    """Print docker load command for a tar file."""
+def generate_import_command_log(tar_file, output_dir=None, digest=None):
+    """Generate docker load command log message."""
     if output_dir and not os.path.isabs(output_dir):
         output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), output_dir)
     
     display_name = tar_file if not output_dir else os.path.join(output_dir, tar_file)
     size_str = format_file_size(os.path.getsize(display_name))
     
-    print("\n" + "=" * 70)
-    print("Docker Import Command")
-    print("=" * 70)
-    print(f"File: {tar_file} ({size_str})")
+    log_lines = [
+        "=" * 70,
+        "Docker Import Command",
+        "=" * 70,
+        f"File: {tar_file} ({size_str})",
+    ]
+    
     if digest:
-        print(f"Digest: {digest}")
-    print(f"Command: docker load -i {tar_file}")
-    print(f"   Or: sudo docker load -i {tar_file}")
-    print("=" * 70)
+        log_lines.append(f"Digest: {digest}")
+    
+    log_lines.extend([
+        f"Command: docker load -i {tar_file}",
+        f"   Or: sudo docker load -i {tar_file}",
+        "=" * 70
+    ])
+    
+    return "\n".join(log_lines)
+
+
+def print_import_command(tar_file, output_dir=None, digest=None):
+    """Print docker load command for a tar file."""
+    log_message = generate_import_command_log(tar_file, output_dir, digest)
+    print("\n" + log_message)

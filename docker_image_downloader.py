@@ -10,7 +10,7 @@ import requests
 import urllib3
 
 from logger_config import setup_logger
-from utils import load_config, get_default_docker_config, setup_proxies, parse_image_name, print_import_command
+from utils import load_config, get_default_docker_config, setup_proxies, parse_image_name, print_import_command, generate_import_command_log
 
 urllib3.disable_warnings()
 
@@ -128,15 +128,18 @@ layers = resp.json()['layers']
 output_dir = config['output']['output_dir']
 os.makedirs(output_dir, exist_ok=True)
 
-# Generate tar filename with digest for uniqueness
+# Generate tar filename with digest and tag for uniqueness
 digest_short = image_digest.replace('sha256:', '')[:12]
-tar_filename = f'{repo.replace("/", "_")}_{img}_{digest_short}{config["output"]["tar_extension"]}'
+tar_filename = f'{repo.replace("/", "_")}_{img}_{tag}_{digest_short}{config["output"]["tar_extension"]}'
 docker_tar = os.path.join(output_dir, tar_filename)
 
 # Check if already exists
 if os.path.exists(docker_tar):
     logger.info(f"Image already exists: {docker_tar}")
     logger.info(f"Skipping download (digest: {image_digest})")
+    # Log the import command info
+    logger.info(f"Docker Import Command - File: {tar_filename}, Digest: {image_digest}")
+    logger.info(f"Command: docker load -i {tar_filename}")
     print_import_command(tar_filename, output_dir, image_digest)
     sys.exit(0)
 
@@ -224,5 +227,7 @@ shutil.rmtree(imgdir)
 logger.info(f'Export completed: {docker_tar}')
 logger.info(f'Image digest: {image_digest}')
 
-# Print import command
+# Print import command and log key info
+logger.info(f"Docker Import Command - File: {tar_filename}, Digest: {image_digest}")
+logger.info(f"Command: docker load -i {tar_filename}")
 print_import_command(tar_filename, output_dir, image_digest)

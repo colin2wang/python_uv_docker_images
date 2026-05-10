@@ -1,5 +1,12 @@
 # Change History
 
+## 2026-05-10
+
+- Added version tag to tar filename for better image identification (e.g., `library_ubuntu_22.04_a1b2c3d4e5f6.tar`)
+- Created DEVELOPMENT_GUIDELINES.md with comprehensive code and documentation standards
+- Enhanced README.md with corrected information and Future Enhancements section
+- Improved documentation accuracy and completeness
+
 ## 2026-05-09
 
 - Added interactive import script (`import_images.sh`) with auto-cleanup
