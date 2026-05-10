@@ -2,7 +2,7 @@
 
 A Python tool for downloading Docker images from registries and exporting them as tar archives for offline use.
 
-[Change History](CHANGE_HISTORY.md) | [Development Guidelines](DEVELOPMENT_GUIDELINES.md)
+[Change History](CHANGE_HISTORY.md) | [Development Guidelines](DEVELOPMENT_GUIDELINES.md) | [中文文档](README_zh.md)
 
 ## Features
 
@@ -178,7 +178,8 @@ python_uv_docker_images/
 ├── logger_config.py                 # Logging configuration
 ├── pyproject.toml                   # Python project metadata
 ├── uv.lock                          # Dependency lock file
-├── README.md                        # Main documentation
+├── README.md                        # Main documentation (English)
+├── README_zh.md                     # Chinese documentation
 ├── CHANGE_HISTORY.md                # Change log
 ├── DEVELOPMENT_GUIDELINES.md        # Development and documentation guidelines
 ├── images/                          # Output directory for tar files
