@@ -1,5 +1,12 @@
 # Change History
 
+## 2026-05-11
+
+- Changed tar filename format to use `#` as separator for repository path (e.g., `serjs#go-socks5-proxy_latest_847fa485f52f.tar`)
+- Fixed RepoTags in manifest.json to preserve full repository path (e.g., `serjs/go-socks5-proxy:latest`)
+- Enhanced import_images.sh to parse and display repository information from filenames
+- Added expected image name display after successful import
+
 ## 2026-05-10
 
 - Added version tag to tar filename for better image identification (e.g., `library_ubuntu_22.04_a1b2c3d4e5f6.tar`)

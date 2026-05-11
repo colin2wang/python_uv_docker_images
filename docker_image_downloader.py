@@ -129,8 +129,9 @@ output_dir = config['output']['output_dir']
 os.makedirs(output_dir, exist_ok=True)
 
 # Generate tar filename with digest and tag for uniqueness
+# Use # as separator to preserve repository path information
 digest_short = image_digest.replace('sha256:', '')[:12]
-tar_filename = f'{repo.replace("/", "_")}_{img}_{tag}_{digest_short}{config["output"]["tar_extension"]}'
+tar_filename = f'{repository.replace("/", "#")}_{tag}_{digest_short}{config["output"]["tar_extension"]}'
 docker_tar = os.path.join(output_dir, tar_filename)
 
 # Check if already exists
@@ -164,7 +165,7 @@ with open(f'{imgdir}/{image_config_digest[7:]}.json', 'wb') as f:
 
 content = [{
     'Config': f'{image_config_digest[7:]}.json',
-    'RepoTags': [f'{img}:{tag}'],
+    'RepoTags': [f'{repository}:{tag}'],
     'Layers': []
 }]
 
@@ -216,7 +217,7 @@ with open(os.path.join(imgdir, 'manifest.json'), 'w') as f:
     json.dump(content, f)
 
 with open(os.path.join(imgdir, 'repositories'), 'w') as f:
-    json.dump({img: {tag: fake_layerid}}, f)
+    json.dump({repository: {tag: fake_layerid}}, f)
 
 # Create tar file
 docker_tar = os.path.join(output_dir, tar_filename)

@@ -100,7 +100,8 @@ Example:
 Added version tag to tar filename
 
 Tar files now include the image version tag for better identification.
-Format: {repo}_{image}_{tag}_{digest}.tar
+Format: {repository_with_#}_{tag}_{digest}.tar
+Repository path uses # instead of / (e.g., serjs#go-socks5-proxy_latest_abc123.tar)
 ```
 
 ## Testing Before Commit

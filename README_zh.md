@@ -132,33 +132,37 @@ chmod +x import_images.sh
 
 Found 2 Docker image archive(s):
 ----------------------------------------------------------------------
-1. library_redis_8.2.6_e2d3c0aeec38.tar (134.78 MB)
-2. library_jenkins_2.563_f7e8d9c0b1a2.tar (681.75 MB)
+1. serjs#go-socks5-proxy_latest_847fa485f52f.tar (30.45 MB)
+2. library#redis_8.2.6_e2d3c0aeec38.tar (134.78 MB)
 ----------------------------------------------------------------------
 0. Exit
 
 Enter number to import (0 to exit): 1
 
-Importing: library_redis_8.2.6_e2d3c0aeec38.tar
+Importing: serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ----------------------------------------------------------------------
-Loaded image: redis:8.2.6
+Repository: serjs/go-socks5-proxy
+Command: docker load -i serjs#go-socks5-proxy_latest_847fa485f52f.tar
 
-✓ Successfully imported: library_redis_8.2.6_e2d3c0aeec38.tar
+Loaded image: serjs/go-socks5-proxy:latest
 
-Delete library_redis_8.2.6_e2d3c0aeec38.tar? (Y/n, default: Y): 
-✓ Deleted: library_redis_8.2.6_e2d3c0aeec38.tar
+✓ Successfully imported: serjs#go-socks5-proxy_latest_847fa485f52f.tar
+Expected image: serjs/go-socks5-proxy:latest
+
+Delete serjs#go-socks5-proxy_latest_847fa485f52f.tar? (Y/n, default: Y): 
+✓ Deleted: serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ```
 
 #### 方式二：手动导入
 
 在目标机器上导入镜像：
 ```bash
-docker load -i library_redis_8.2.6_e2d3c0aeec38.tar
+docker load -i serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ```
 
 或使用 sudo：
 ```bash
-sudo docker load -i library_redis_8.2.6_e2d3c0aeec38.tar
+sudo docker load -i serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ```
 
 验证导入：
@@ -204,10 +208,12 @@ python_uv_docker_images/
 ## 注意事项
 
 - 工具自动处理多架构清单并选择 amd64
-- **Tar 文件名包含版本标签和摘要**，便于识别（例如：`library_redis_8.2.6_e2d3c0aeec38.tar`）
+- **Tar 文件名使用 `#` 作为分隔符**以保留仓库路径（例如：`serjs#go-socks5-proxy_latest_847fa485f52f.tar`）
+- **完整的仓库路径保存在镜像元数据中** - 导入的镜像保留原始名称（例如：`serjs/go-socks5-proxy:latest`）
 - **镜像摘要用作唯一标识符** - 防止重复下载相同镜像
 - 如果存在具有相同摘要的镜像，将自动跳过下载
-- 导入脚本（`import_images.sh`）自动检测 Docker 权限并在必要时使用 sudo
+- 导入脚本（`import_images.sh`）会显示从文件名解析的仓库信息
+- 导入脚本自动检测 Docker 权限并在必要时使用 sudo
 - 为避免 sudo 提示，将用户添加到 docker 组：`sudo usermod -aG docker $USER`
 - 层下载时会在控制台和日志文件中记录进度
 - 导出后自动清理临时文件

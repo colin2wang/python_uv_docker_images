@@ -62,13 +62,46 @@ import_image() {
     echo -e "${BLUE}Importing: $filename${NC}"
     echo "----------------------------------------------------------------------"
     
+    # Extract repository name from filename (format: repository#subrepo_tag_digest.tar)
+    # Remove .tar extension and extract the repository part before _tag_
+    local base_name="${filename%.tar}"
+    
+    # Try to parse repository from filename using # as separator
+    # Format: repo#subrepo_tag_digest or library_image_tag_digest
+    if [[ "$base_name" == *"#"* ]]; then
+        # Has # separator, reconstruct repository path
+        local repo_part=$(echo "$base_name" | sed 's/_[^_]*_[a-f0-9]*$//')
+        local original_repo=$(echo "$repo_part" | sed 's/#/\//g')
+        echo -e "${YELLOW}Repository: $original_repo${NC}"
+    fi
+    
+    # Show the command that will be executed
+    echo -e "${YELLOW}Command: docker load -i $filename${NC}"
+    echo ""
+    
     # Try docker load, if permission denied, try with sudo
     if docker load -i "$file" 2>/dev/null; then
         echo ""
         echo -e "${GREEN}✓ Successfully imported: $filename${NC}"
+        
+        # Show the loaded image info
+        if [[ "$base_name" == *"#"* ]]; then
+            local repo_part=$(echo "$base_name" | sed 's/_[^_]*_[a-f0-9]*$//')
+            local original_repo=$(echo "$repo_part" | sed 's/#/\//g')
+            local tag_part=$(echo "$base_name" | grep -oP '_\K[^_]+(?=_[a-f0-9]+$)')
+            echo -e "${GREEN}Expected image: ${original_repo}:${tag_part}${NC}"
+        fi
     elif sudo docker load -i "$file"; then
         echo ""
         echo -e "${GREEN}✓ Successfully imported (with sudo): $filename${NC}"
+        
+        # Show the loaded image info
+        if [[ "$base_name" == *"#"* ]]; then
+            local repo_part=$(echo "$base_name" | sed 's/_[^_]*_[a-f0-9]*$//')
+            local original_repo=$(echo "$repo_part" | sed 's/#/\//g')
+            local tag_part=$(echo "$base_name" | grep -oP '_\K[^_]+(?=_[a-f0-9]+$)')
+            echo -e "${GREEN}Expected image: ${original_repo}:${tag_part}${NC}"
+        fi
     else
         echo ""
         echo -e "${RED}✗ Failed to import: $filename${NC}"

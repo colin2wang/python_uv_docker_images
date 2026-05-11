@@ -132,33 +132,37 @@ chmod +x import_images.sh
 
 Found 2 Docker image archive(s):
 ----------------------------------------------------------------------
-1. library_redis_8.2.6_e2d3c0aeec38.tar (134.78 MB)
-2. library_jenkins_2.563_f7e8d9c0b1a2.tar (681.75 MB)
+1. serjs#go-socks5-proxy_latest_847fa485f52f.tar (30.45 MB)
+2. library#redis_8.2.6_e2d3c0aeec38.tar (134.78 MB)
 ----------------------------------------------------------------------
 0. Exit
 
 Enter number to import (0 to exit): 1
 
-Importing: library_redis_8.2.6_e2d3c0aeec38.tar
+Importing: serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ----------------------------------------------------------------------
-Loaded image: redis:8.2.6
+Repository: serjs/go-socks5-proxy
+Command: docker load -i serjs#go-socks5-proxy_latest_847fa485f52f.tar
 
-✓ Successfully imported: library_redis_8.2.6_e2d3c0aeec38.tar
+Loaded image: serjs/go-socks5-proxy:latest
 
-Delete library_redis_8.2.6_e2d3c0aeec38.tar? (Y/n, default: Y): 
-✓ Deleted: library_redis_8.2.6_e2d3c0aeec38.tar
+✓ Successfully imported: serjs#go-socks5-proxy_latest_847fa485f52f.tar
+Expected image: serjs/go-socks5-proxy:latest
+
+Delete serjs#go-socks5-proxy_latest_847fa485f52f.tar? (Y/n, default: Y): 
+✓ Deleted: serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ```
 
 #### Option 2: Manual Import
 
 On the target machine, import the images:
 ```bash
-docker load -i library_redis_8.2.6_e2d3c0aeec38.tar
+docker load -i serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ```
 
 Or with sudo:
 ```bash
-sudo docker load -i library_redis_8.2.6_e2d3c0aeec38.tar
+sudo docker load -i serjs#go-socks5-proxy_latest_847fa485f52f.tar
 ```
 
 Verify the import:
@@ -204,10 +208,12 @@ python_uv_docker_images/
 ## Notes
 
 - The tool automatically handles multi-architecture manifests and selects amd64
-- **Tar filenames include version tag and digest** for easy identification (e.g., `library_redis_8.2.6_e2d3c0aeec38.tar`)
+- **Tar filenames use `#` as separator** to preserve repository path (e.g., `serjs#go-socks5-proxy_latest_847fa485f52f.tar`)
+- **Full repository path is preserved in image metadata** - imported images retain their original names (e.g., `serjs/go-socks5-proxy:latest`)
 - **Image digest is used as a unique identifier** - prevents duplicate downloads of the same image
 - If an image with the same digest exists, download is skipped automatically
-- The import script (`import_images.sh`) auto-detects Docker permissions and uses sudo when necessary
+- The import script (`import_images.sh`) displays repository information parsed from filenames
+- The import script auto-detects Docker permissions and uses sudo when necessary
 - To avoid sudo prompts, add your user to the docker group: `sudo usermod -aG docker $USER`
 - Layers are downloaded with progress logging to both console and log files
 - Temporary files are automatically cleaned up after export
