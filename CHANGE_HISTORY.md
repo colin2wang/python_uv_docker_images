@@ -2,6 +2,9 @@
 
 ## 2026-05-19
 
+- Modified import_images.sh to move imported images to ./imported directory instead of deleting
+- Added exclusion rule to prevent scanning files in ./imported directory
+- Enhanced user interaction with clear prompts for file management after import
 - Added download progress bar using tqdm library for better user experience
 - Implemented resume download functionality to recover from network interruptions
 - Added retry mechanism with configurable max retries and delay for failed downloads

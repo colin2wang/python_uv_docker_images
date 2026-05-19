@@ -18,8 +18,8 @@ echo "  Docker Image Import Tool"
 echo "======================================================================"
 echo ""
 
-# Find all .tar files in current directory
-mapfile -t tar_files < <(find . -maxdepth 1 -name "*.tar" -type f | sort)
+# Find all .tar files in current directory (exclude ./imported directory)
+mapfile -t tar_files < <(find . -maxdepth 1 -name "*.tar" -type f ! -path "./imported/*" | sort)
 
 # Check if any tar files found
 if [ ${#tar_files[@]} -eq 0 ]; then
@@ -109,16 +109,18 @@ import_image() {
         return 1
     fi
     
-    # Ask if delete
+    # Ask if move to imported directory
     echo ""
-    read -p "Delete $filename? (Y/n, default: Y): " delete_choice
-    delete_choice=${delete_choice:-Y}
+    read -p "Move $filename to ./imported directory? (Y/n, default: Y): " move_choice
+    move_choice=${move_choice:-Y}
     
-    if [[ "$delete_choice" =~ ^[Yy]$ ]] || [[ -z "$delete_choice" ]]; then
-        rm -f "$file"
-        echo -e "${GREEN}✓ Deleted: $filename${NC}"
+    if [[ "$move_choice" =~ ^[Yy]$ ]] || [[ -z "$move_choice" ]]; then
+        # Create imported directory if it doesn't exist
+        mkdir -p ./imported
+        mv "$file" ./imported/
+        echo -e "${GREEN}✓ Moved to ./imported/: $filename${NC}"
     else
-        echo -e "${YELLOW}Kept: $filename${NC}"
+        echo -e "${YELLOW}Kept in current directory: $filename${NC}"
     fi
 }
 
