@@ -1,5 +1,15 @@
 # Change History
 
+## 2026-05-19
+
+- Added download progress bar using tqdm library for better user experience
+- Implemented resume download functionality to recover from network interruptions
+- Added retry mechanism with configurable max retries and delay for failed downloads
+- Enhanced error handling to preserve temp directory on failure for recovery
+- Added configuration options for download settings (max_retries, retry_delay, show_progress)
+- Added resume support configuration (enabled, auto_cleanup)
+- Updated dependencies to include tqdm>=4.67.1
+
 ## 2026-05-11
 
 - Changed tar filename format to use `#` as separator for repository path (e.g., `serjs#go-socks5-proxy_latest_847fa485f52f.tar`)

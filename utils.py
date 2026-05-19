@@ -45,7 +45,16 @@ def get_default_docker_config():
             'arch': 'amd64'
         },
         'ssl_verify': False,
-        'request_timeout': 300
+        'request_timeout': 300,
+        'download': {
+            'max_retries': 3,
+            'retry_delay': 5,
+            'show_progress': True  # Show download progress bar
+        },
+        'resume': {
+            'enabled': True,
+            'auto_cleanup': True
+        }
     }
 
 
